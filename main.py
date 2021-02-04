@@ -7,6 +7,7 @@ import pytz
 
 # User modules.
 import utils
+import functions
 
 
 # ロガーを取得します。
@@ -28,6 +29,7 @@ args = parser.parse_args()
 logger.info(f'PR [{args.head} -> {args.base}] will be made.')
 
 # api を使って PR を作ります。
+created_issue_number = functions.create_pull(args.head, args.base)
 
 # NOTE: ここ以降の処理はすべて、
 #       「PR の commits 一覧を Slack へ通知したい」
