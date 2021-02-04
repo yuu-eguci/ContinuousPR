@@ -106,7 +106,7 @@ def create_comment_body(list_commits_on_pull_result: list) -> str:
         str: コメントの body に使われる想定の文字列
     """
 
-    body = '## Release note'
+    body = '## リリースノート'
     for commit in list_commits_on_pull_result:
         message = commit['commit']['message']
         author_name = commit['commit']['author']['name']

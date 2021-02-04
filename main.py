@@ -1,6 +1,7 @@
 # Built-in modules.
 import datetime
 import argparse
+import time
 
 # Third-party modules.
 import pytz
@@ -66,12 +67,15 @@ logger.info(f'Successfully created comment: {create_comment_result["html_url"]}'
 #       ただし Slack 側に PR へのリンクも欲しいのでコメント通知を取り入れています。
 message = f'''
 <!channel> 数日中に、 {args.base} 環境へのリリース作業を行います。
-内容は↑のリリースノートを確認してください。
+内容は↑に投稿されたリリースノートを確認してください。
 
 【お知らせ】編集担当者の方は、リリースノートを確認して頂き、
 お知らせが必要な項目について本 channel に文面を投稿してください。
 
 [本メッセージは自動送信メッセージです]
 '''
+# NOTE: 待機しているのは、通知の順番をプログラムの実行順と合わせるためです。
+#       待機せずに send_slack_message すると、こちらのメッセージが上のコメント通知よりも先に送付されてしまうので。
+time.sleep(10)
 utils.send_slack_message(message)
 logger.info('Successfully sent message to Slack')
