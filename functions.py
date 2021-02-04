@@ -21,7 +21,7 @@ HEADERS_FOR_API = {
 }
 
 
-def create_pull(head_branch: str, base_branch: str) -> int:
+def create_pull(head_branch: str, base_branch: str) -> dict:
     """api.github.com を使って PR を作成します。
 
     Args:
@@ -29,7 +29,7 @@ def create_pull(head_branch: str, base_branch: str) -> int:
         base_branch (str): Base branch
 
     Returns:
-        int: Created issue number
+        dict: Returned value from api
     """
 
     url = f'https://api.github.com/repos/{consts.OWNER}/{consts.REPO}/pulls'
@@ -46,11 +46,32 @@ def create_pull(head_branch: str, base_branch: str) -> int:
 
     # 返却 json -> dict します。
     dic = res.json()
+    return dic
 
-    # Issue 番号を返します。
-    # NOTE: api.github.com の文脈では PR も issue のひとつです。
-    #       もともと int のはずですが明示的に int とします。
-    return int(dic['number'])
+
+def add_label(issue_number: int) -> dict:
+    """api.github.com を使ってラベルを追加します。
+    ラベルがもともとなくとも、自動で生成されます。
+
+    Args:
+        issue_number (int): Issue number
+
+    Returns:
+        dict: Returned value from api
+    """
+
+    url = f'https://api.github.com/repos/{consts.OWNER}/{consts.REPO}/issues/{issue_number}/labels'  # noqa: E501
+    payload = {
+        'labels': ['CONTINUOUS-PR'],
+    }
+    res = requests.post(url, headers=HEADERS_FOR_API, data=json.dumps(payload))
+
+    # 200 系でなければ raise HTTPError します。
+    res.raise_for_status()
+
+    # 返却 json -> dict します。
+    dic = res.json()
+    return dic
 
 
 if __name__ == '__main__':

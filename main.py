@@ -1,6 +1,7 @@
 # Built-in modules.
 import datetime
 import argparse
+from pprint import pprint
 
 # Third-party modules.
 import pytz
@@ -29,7 +30,8 @@ args = parser.parse_args()
 logger.info(f'PR [{args.head} -> {args.base}] will be made.')
 
 # api を使って PR を作ります。
-created_issue_number = functions.create_pull(args.head, args.base)
+create_pull_result = functions.create_pull(args.head, args.base)
+logger.info(f'Successfully created PR: {create_pull_result["html_url"]}')
 
 # NOTE: ここ以降の処理はすべて、
 #       「PR の commits 一覧を Slack へ通知したい」
@@ -40,6 +42,8 @@ created_issue_number = functions.create_pull(args.head, args.base)
 # api を使って PR にラベルを付与します。
 # NOTE: Slack への通知を考慮して行っています。
 #       Slack は、特定のラベルをもつ PR についてのみ通知をする設定が可能です。
+add_label_result = functions.add_label(create_pull_result['number'])
+logger.info(f'Successfully added label: {add_label_result["url"]}')
 
 # api を使って PR の commits 一覧を取得します。
 # NOTE: コメントに一覧を含めるための作業です。
