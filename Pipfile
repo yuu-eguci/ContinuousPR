@@ -4,6 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pytz = "*"
+python-dotenv = "*"
+slack-sdk = "*"
 
 [dev-packages]
 
