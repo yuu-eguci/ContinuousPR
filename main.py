@@ -1,7 +1,6 @@
 # Built-in modules.
 import datetime
 import argparse
-from pprint import pprint
 
 # Third-party modules.
 import pytz
@@ -65,3 +64,14 @@ logger.info(f'Successfully created comment: {create_comment_result["html_url"]}'
 # NOTE: メンション付で投稿を行うための処置です。
 #       ここに commits 一覧も含めてしまえばラベルやコメントが不要になります。
 #       ただし Slack 側に PR へのリンクも欲しいのでコメント通知を取り入れています。
+message = f'''
+<!channel> 数日中に、 {args.base} 環境へのリリース作業を行います。
+内容は↑のリリースノートを確認してください。
+
+【お知らせ】編集担当者の方は、リリースノートを確認して頂き、
+お知らせが必要な項目について本 channel に文面を投稿してください。
+
+[本メッセージは自動送信メッセージです]
+'''
+utils.send_slack_message(message)
+logger.info('Successfully sent message to Slack')
