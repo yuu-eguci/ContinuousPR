@@ -19,6 +19,13 @@ logger.info(f'Started at {current_jst.isoformat()}')
 # head branch と base branch を引数から取得します。
 # head -> base の PR となります。
 # NOTE: TOKEN 等は環境変数で良いですが、ブランチは実行ごとに可変にしたい。
+parser = argparse.ArgumentParser()
+parser.add_argument('-H', '--head', type=str, help='head -> base',
+                    default='dev')
+parser.add_argument('-B', '--base', type=str, help='head -> base',
+                    default='master')
+args = parser.parse_args()
+logger.info(f'PR [{args.head} -> {args.base}] will be made.')
 
 # api を使って PR を作ります。
 
