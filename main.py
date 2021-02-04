@@ -43,11 +43,14 @@ logger.info(f'Successfully created PR: {create_pull_result["html_url"]}')
 # NOTE: Slack への通知を考慮して行っています。
 #       Slack は、特定のラベルをもつ PR についてのみ通知をする設定が可能です。
 add_label_result = functions.add_label(create_pull_result['number'])
-logger.info(f'Successfully added label: {add_label_result["url"]}')
+logger.info(f'Successfully added label: {add_label_result[0]["url"]}')
 
 # api を使って PR の commits 一覧を取得します。
 # NOTE: コメントに一覧を含めるための作業です。
 #       それが不要ならこちらも不要です。
+list_commits_on_pull_result = functions.list_commits_on_pull(
+    create_pull_result['number'])
+pprint(list_commits_on_pull_result)
 
 # api を使って PR へコメントを投稿します。
 # NOTE: この時点で GitHub を通じて Slack へ通知が送られていることを想定しています。

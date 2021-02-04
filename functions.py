@@ -74,5 +74,26 @@ def add_label(issue_number: int) -> dict:
     return dic
 
 
+def list_commits_on_pull(issue_number: int) -> dict:
+    """api.github.com を使って PR に含まれる commits 一覧を取得します。
+
+    Args:
+        issue_number (int): Issue number
+
+    Returns:
+        dict: Returned value from api
+    """
+
+    url = f'https://api.github.com/repos/{consts.OWNER}/{consts.REPO}/pulls/{issue_number}/commits'  # noqa: E501
+    res = requests.get(url, headers=HEADERS_FOR_API)
+
+    # 200 系でなければ raise HTTPError します。
+    res.raise_for_status()
+
+    # 返却 json -> dict します。
+    dic = res.json()
+    return dic
+
+
 if __name__ == '__main__':
     pass
