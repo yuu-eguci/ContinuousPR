@@ -1,0 +1,51 @@
+# NOTE: 没になった workflow です。
+#       本来この repository ContinuousPR で行っていることは、たったひとつの workflow でまかなえてよいようなことです。
+#       hub コマンドや gh コマンドに不具合がなければその筋で進めることができました。
+#       どこが修正されれば workflow のみで実現できるのか Rejected workflow が残しておきます。
+name: Rejected workflow
+
+on:
+  # NOTE: 手動実行のことです。
+  workflow_dispatch:
+
+jobs:
+  pr:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # dev -> master PR の場合 dev へ checkout します。
+    - name: Checkout dev branch
+      uses: actions/checkout@v2
+      with:
+        ref: dev
+
+    # NOTE: geertvdc/setup-hub を利用するサンプルがよく見られるが、それは必要ありません。
+    #       setup-hub しなくとも hub コマンドは使えます。
+    - name: Display hub version
+      run: |
+        hub --version
+
+    # NOTE: GITHUB_USER, GITHUB_TOKEN はデフォルトで存在します。
+    # FIXME: hub コマンドのもつ問題一覧。
+    #        - --labels オプションは PR 作成後に後付で付与される。そのせいで label による Slack filtering が機能しない。
+    #          Issue になっているが対応なし https://github.com/integrations/slack/issues/1039 (since 5 Jun 2020)
+    #        - --draft で PR できるのに ready は不可。
+    #          Issue になっているが完全に無視されている https://github.com/github/hub/issues/2312
+    # FIXME: gh コマンドのもつ問題一覧。
+    #        - TEMPLATE 指定不可。 hub に機能で劣る。
+    #          Issue になっているが対応なし https://github.com/cli/cli/issues/1553 (since on 20 Aug 2020)
+    #        - pr ready コマンドがデフォルトの GITHUB_TOKEN で Resource not accessible by integration エラーを起こす
+    #          Issue になっているが対応なし https://github.com/cli/cli/issues/1314 (since 4 Jul 2020)
+    # NOTE: 結局これらが FIX されたとしても api.github.com のほうが圧倒的に便利なのでそっちを使うと思います。
+    - name: Create Pull Request
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        pr_url=$(hub pull-request --base master --file .github/PULL_REQUEST_TEMPLATE_FOR_WORKFLOW.md --labels FOO --draft)
+        echo pr_url
+        echo ${pr_url}
+        gh --version
+        gh pr ready ${pr_url}
+      # gh pr create --base master --title "⚗️ sample" --body "FOO BAR" --draft --label FOO
