@@ -38,6 +38,8 @@ logger.info(f'Successfully created PR: {create_pull_result["html_url"]}')
 #       「しかも特定 channel に」
 #       「その channel にはこの定期 PR 以外の通知はしたくない」というニーズのためだけにある七面倒な処理です。
 #       「Slack 通知は不要」「必要だが他の PR と一緒の channel で良い」という場合は以降不要です。
+# NOTE: Slack notification コマンドはこちら。
+#       /github subscribe OWNER/REPO pulls,comments,+label:"CONTINUOUS-PR"
 
 # api を使って PR にラベルを付与します。
 # NOTE: Slack への通知を考慮して行っています。
@@ -50,10 +52,14 @@ logger.info(f'Successfully added label: {add_label_result[0]["url"]}')
 #       それが不要ならこちらも不要です。
 list_commits_on_pull_result = functions.list_commits_on_pull(
     create_pull_result['number'])
+logger.info(f'Successfully listed commits, count: {len(list_commits_on_pull_result)}')  # noqa: E501
 comment_body = functions.create_comment_body(list_commits_on_pull_result)
 
 # api を使って PR へコメントを投稿します。
 # NOTE: この時点で GitHub を通じて Slack へ通知が送られていることを想定しています。
+create_comment_result = functions.create_comment(
+    create_pull_result['number'], comment_body)
+logger.info(f'Successfully created comment: {create_comment_result["html_url"]}')  # noqa: E501
 
 # その他、個別に Slack へ投稿を行います。
 # NOTE: メンション付で投稿を行うための処置です。

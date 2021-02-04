@@ -120,5 +120,30 @@ def create_comment_body(list_commits_on_pull_result: list) -> str:
     return body
 
 
+def create_comment(issue_number: int, body: str) -> dict:
+    """api.github.com を使って PR にコメントを投稿します。
+
+    Args:
+        issue_number (int): Issue number
+        body (str): 投稿コメント
+
+    Returns:
+        dict: Returned value from api
+    """
+
+    url = f'https://api.github.com/repos/{consts.OWNER}/{consts.REPO}/issues/{issue_number}/comments'  # noqa: E501
+    payload = {
+        'body': body,
+    }
+    res = requests.post(url, headers=HEADERS_FOR_API, data=json.dumps(payload))
+
+    # 200 系でなければ raise HTTPError します。
+    res.raise_for_status()
+
+    # 返却 json -> dict します。
+    dic = res.json()
+    return dic
+
+
 if __name__ == '__main__':
     pass
