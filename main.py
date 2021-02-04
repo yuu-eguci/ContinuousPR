@@ -50,7 +50,7 @@ logger.info(f'Successfully added label: {add_label_result[0]["url"]}')
 #       それが不要ならこちらも不要です。
 list_commits_on_pull_result = functions.list_commits_on_pull(
     create_pull_result['number'])
-pprint(list_commits_on_pull_result)
+comment_body = functions.create_comment_body(list_commits_on_pull_result)
 
 # api を使って PR へコメントを投稿します。
 # NOTE: この時点で GitHub を通じて Slack へ通知が送られていることを想定しています。
