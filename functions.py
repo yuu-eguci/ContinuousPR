@@ -108,7 +108,12 @@ def create_comment_body(list_commits_on_pull_result: list) -> str:
 
     body = '## リリースノート'
     for commit in list_commits_on_pull_result:
-        message = commit['commit']['message']
+
+        # メッセージの1行目のみをリリースノートへ記述します。
+        # NOTE: git のメッセージは複数行になります。改行が入るとリリースノートがぐっちゃになるので絞っています。
+        messages = commit['commit']['message']
+        message = messages.split('\n')[0]
+
         author_name = commit['commit']['author']['name']
         author_date = commit['commit']['author']['date']
         body += (
