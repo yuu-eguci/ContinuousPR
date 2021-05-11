@@ -1,7 +1,6 @@
 # Built-in modules.
 import datetime
 import argparse
-import time
 import sys
 
 # Third-party modules.
@@ -43,49 +42,26 @@ logger.info(f'Successfully created PR: {create_pull_result["html_url"]}')
 if not args.slack_notification:
     sys.exit('Slack notification is off.')
 
-# NOTE: ここ以降の処理はすべて、
-#       「PR の commits 一覧を Slack へ通知したい」
-#       「しかも特定 channel に」
-#       「その channel にはこの定期 PR 以外の通知はしたくない」というニーズのためだけにある七面倒な処理です。
-#       「Slack 通知は不要」「必要だが他の PR と一緒の channel で良い」という場合は以降不要です。
-# NOTE: Slack notification コマンドはこちら。
+# NOTE: ここ以降の処理は、
+#       「PR の commits 一覧をリリースノートとして Slack へ通知したい」
+#       というニーズのためにある処理です。
+#       もともとは、「PR コメントにリリースノートを投稿し、それを Slack へ通知する」と
+#       わざわざ「PR コメント」を経由していたため、ラベルをつけたりなんだりと非常に苦労しましたが
+#       「いや直接 Slack にメッセージしたらいいじゃん」ということで簡略化できました。
+# NOTE: ラベル指定での Slack notification は知見として残しておきます。
+#       下記コマンドで通知可能です。
 #       /github subscribe OWNER/REPO pulls,comments,+label:"CONTINUOUS-PR"
 
-# api を使って PR にラベルを付与します。
-# NOTE: Slack への通知を考慮して行っています。
-#       Slack は、特定のラベルをもつ PR についてのみ通知をする設定が可能です。
-add_label_result = functions.add_label(create_pull_result['number'])
-logger.info(f'Successfully added label: {add_label_result[0]["url"]}')
-
 # api を使って PR の commits 一覧を取得します。
-# NOTE: コメントに一覧を含めるための作業です。
-#       それが不要ならこちらも不要です。
+# NOTE: 「リリースノート」となる一覧を取得するための処理です。
 list_commits_on_pull_result = functions.list_commits_on_pull(
     create_pull_result['number'])
 logger.info(f'Successfully listed commits, count: {len(list_commits_on_pull_result)}')  # noqa: E501
-comment_body = functions.create_comment_body(list_commits_on_pull_result)
+comment_body = functions.create_comment_body(
+    list_commits_on_pull_result,
+    args.base,
+)
 
-# api を使って PR へコメントを投稿します。
-# NOTE: この時点で GitHub を通じて Slack へ通知が送られていることを想定しています。
-create_comment_result = functions.create_comment(
-    create_pull_result['number'], comment_body)
-logger.info(f'Successfully created comment: {create_comment_result["html_url"]}')  # noqa: E501
-
-# その他、個別に Slack へ投稿を行います。
-# NOTE: メンション付で投稿を行うための処置です。
-#       ここに commits 一覧も含めてしまえばラベルやコメントが不要になります。
-#       ただし Slack 側に PR へのリンクも欲しいのでコメント通知を取り入れています。
-message = f'''
-<!channel> 数日中に、 {args.base} 環境へのリリース作業を行います。
-内容は↑に投稿されたリリースノートを確認してください。
-
-【お知らせ】編集担当者の方は、リリースノートを確認して頂き、
-お知らせが必要な項目について本 channel に文面を投稿してください。
-
-[本メッセージは自動送信メッセージです]
-'''
-# NOTE: 待機しているのは、通知の順番をプログラムの実行順と合わせるためです。
-#       待機せずに send_slack_message すると、こちらのメッセージが上のコメント通知よりも先に送付されてしまうので。
-time.sleep(10)
-utils.send_slack_message(message)
+# comment_body として取得した内容は、リリースノートとして扱い Slack へ送ります。
+utils.send_slack_message(comment_body)
 logger.info('Successfully sent message to Slack')
