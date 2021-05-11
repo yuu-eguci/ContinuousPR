@@ -40,12 +40,18 @@ def create_pull(head_branch: str, base_branch: str) -> dict:
         'body': consts.PR_BODY,
     }
     res = requests.post(url, headers=HEADERS_FOR_API, data=json.dumps(payload))
+    dic = res.json()
 
     # 200 系でなければ raise HTTPError します。
+    # NOTE: いちいち返却値を if でチェックする手間をはぶくために raise_for_status を使っているはずです。
+    #       ただ raise_for_status では api から返ってくるエラーメッセージを表示できません。
+    #       エラーメッセージ表示のために if しています。
+    #       errors 例: [{'resource': 'PullRequest', 'code': 'custom',
+    #                   'message': 'A pull request already exists for yuu-eguci:dev.'}]
+    if 'errors' in dic and dic['errors'] and 'message' in dic['errors'][0]:
+        logger.error(dic['errors'][0]['message'])
     res.raise_for_status()
 
-    # 返却 json -> dict します。
-    dic = res.json()
     return dic
 
 
