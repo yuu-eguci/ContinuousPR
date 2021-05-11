@@ -55,31 +55,6 @@ def create_pull(head_branch: str, base_branch: str) -> dict:
     return dic
 
 
-def add_label(issue_number: int) -> list:
-    """api.github.com を使ってラベルを追加します。
-    ラベルがもともとなくとも、自動で生成されます。
-
-    Args:
-        issue_number (int): Issue number
-
-    Returns:
-        list: Returned value from api
-    """
-
-    url = f'https://api.github.com/repos/{consts.OWNER}/{consts.REPO}/issues/{issue_number}/labels'  # noqa: E501
-    payload = {
-        'labels': ['CONTINUOUS-PR'],
-    }
-    res = requests.post(url, headers=HEADERS_FOR_API, data=json.dumps(payload))
-
-    # 200 系でなければ raise HTTPError します。
-    res.raise_for_status()
-
-    # 返却 json -> list します。
-    lis = res.json()
-    return lis
-
-
 def list_commits_on_pull(issue_number: int) -> list:
     """api.github.com を使って PR に含まれる commits 一覧を取得します。
 

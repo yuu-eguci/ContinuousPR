@@ -53,25 +53,14 @@ if not args.slack_notification:
 #       下記コマンドで通知可能です。
 #       /github subscribe OWNER/REPO pulls,comments,+label:"CONTINUOUS-PR"
 
-# api を使って PR にラベルを付与します。
-# NOTE: Slack への通知を考慮して行っています。
-#       Slack は、特定のラベルをもつ PR についてのみ通知をする設定が可能です。
-add_label_result = functions.add_label(create_pull_result['number'])
-logger.info(f'Successfully added label: {add_label_result[0]["url"]}')
-
 # api を使って PR の commits 一覧を取得します。
-# NOTE: コメントに一覧を含めるための作業です。
-#       それが不要ならこちらも不要です。
+# NOTE: 「リリースノート」となる一覧を取得するための処理です。
 list_commits_on_pull_result = functions.list_commits_on_pull(
     create_pull_result['number'])
 logger.info(f'Successfully listed commits, count: {len(list_commits_on_pull_result)}')  # noqa: E501
 comment_body = functions.create_comment_body(list_commits_on_pull_result)
 
-# api を使って PR へコメントを投稿します。
-# NOTE: この時点で GitHub を通じて Slack へ通知が送られていることを想定しています。
-create_comment_result = functions.create_comment(
-    create_pull_result['number'], comment_body)
-logger.info(f'Successfully created comment: {create_comment_result["html_url"]}')  # noqa: E501
+print(comment_body)
 
 # その他、個別に Slack へ投稿を行います。
 # NOTE: メンション付で投稿を行うための処置です。
