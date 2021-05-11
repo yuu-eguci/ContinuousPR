@@ -50,3 +50,20 @@ HEROKU_API_KEY = ''
 HEROKU_APP_NAME = ''
 HEROKU_EMAIL = ''
 ```
+
+## .env
+
+```
+# 実際にプログラムが動く環境で必要な env(Heroku を想定)
+OWNER = ''
+REPO = ''
+TOKEN_REPO_SCOPE = ''
+SLACK_BOT_TOKEN = ''
+SLACK_MESSAGE_CHANNEL = ''
+PR_BODY = ""
+
+# CI/CD 環境で必要な env(GitHub Actions を想定)
+HEROKU_API_KEY = ''
+HEROKU_APP_NAME = ''
+HEROKU_EMAIL = ''
+```
