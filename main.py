@@ -43,12 +43,14 @@ logger.info(f'Successfully created PR: {create_pull_result["html_url"]}')
 if not args.slack_notification:
     sys.exit('Slack notification is off.')
 
-# NOTE: ここ以降の処理はすべて、
-#       「PR の commits 一覧を Slack へ通知したい」
-#       「しかも特定 channel に」
-#       「その channel にはこの定期 PR 以外の通知はしたくない」というニーズのためだけにある七面倒な処理です。
-#       「Slack 通知は不要」「必要だが他の PR と一緒の channel で良い」という場合は以降不要です。
-# NOTE: Slack notification コマンドはこちら。
+# NOTE: ここ以降の処理は、
+#       「PR の commits 一覧をリリースノートとして Slack へ通知したい」
+#       というニーズのためにある処理です。
+#       もともとは、「PR コメントにリリースノートを投稿し、それを Slack へ通知する」と
+#       わざわざ「PR コメント」を経由していたため、ラベルをつけたりなんだりと非常に苦労しましたが
+#       「いや直接 Slack にメッセージしたらいいじゃん」ということで簡略化できました。
+# NOTE: ラベル指定での Slack notification は知見として残しておきます。
+#       下記コマンドで通知可能です。
 #       /github subscribe OWNER/REPO pulls,comments,+label:"CONTINUOUS-PR"
 
 # api を使って PR にラベルを付与します。
