@@ -30,9 +30,33 @@ parser.add_argument('-B', '--base', type=str, help='head -> base',
                     default='master')
 parser.add_argument('-S', '--slack-notification', type=bool,
                     help='Send release note message to Slack', default=False)
+parser.add_argument('-D', '--date', type=int,
+                    help='Run this program only on this date',
+                    # default=0 のときは日付に構わず実行します。
+                    # NOTE: Heroku 上で毎日発火する場合は日付指定が良い仕事をします。
+                    #       しかしテストで実行したいときは、毎回その日の日付をコマンドライン引数に含めるのは面倒です。
+                    #       その手間を省くために用意したデフォルト値です。
+                    default=0)
 args = parser.parse_args()
 logger.info(f'PR [{args.head} -> {args.base}] will be made.'
             f' Slack notification is {"on" if args.slack_notification else "off"}.')
+
+# 実行日チェックです。
+# NOTE: 本スクリプトは毎日の定期発火を想定しています。
+#       ただし、 PR が欲しいのは月イチなので、毎日実行されると不都合です。
+#       そのため、コマンドライン引数で日付を受け取り、その日にのみ続きの処理を行います。
+if args.date == 0:
+    # 上述したとおり、 0 のときは構わず実行します。
+    pass
+else:
+    # 「* 日にだけ実行してほしい」、と指定がある場合です。チェックしてやります。
+    today = utils.get_today_jst('%d')
+    if str(args.date) != today:
+        logger.info(
+            'This is not the date to create PR.'
+            f' Specified date: {args.date} Today: {today}'
+        )
+        sys.exit()
 
 # api を使って PR を作ります。
 create_pull_result = functions.create_pull(args.head, args.base)
@@ -40,7 +64,7 @@ logger.info(f'Successfully created PR: {create_pull_result["html_url"]}')
 
 # 「Slack 通知不要」ならばここで終了です。
 if not args.slack_notification:
-    sys.exit('Slack notification is off.')
+    sys.exit()
 
 # NOTE: ここ以降の処理は、
 #       「PR の commits 一覧をリリースノートとして Slack へ通知したい」

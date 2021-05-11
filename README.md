@@ -23,12 +23,15 @@ python main.py --head dev --base master
 
 ```plaintext
 # python main.py -h
-usage: main.py [-h] [-H HEAD] [-B BASE]
+usage: main.py [-h] [-H HEAD] [-B BASE] [-S SLACK_NOTIFICATION] [-D DATE]
 
 optional arguments:
   -h, --help            show this help message and exit
   -H HEAD, --head HEAD  head -> base
   -B BASE, --base BASE  head -> base
+  -S SLACK_NOTIFICATION, --slack-notification SLACK_NOTIFICATION
+                        Send release note message to Slack
+  -D DATE, --date DATE  Run this program only on this date
 ```
 
 ## .env
