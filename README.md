@@ -23,12 +23,32 @@ python main.py --head dev --base master
 
 ```plaintext
 # python main.py -h
-usage: main.py [-h] [-H HEAD] [-B BASE]
+usage: main.py [-h] [-H HEAD] [-B BASE] [-S SLACK_NOTIFICATION] [-D DATE]
 
 optional arguments:
   -h, --help            show this help message and exit
   -H HEAD, --head HEAD  head -> base
   -B BASE, --base BASE  head -> base
+  -S SLACK_NOTIFICATION, --slack-notification SLACK_NOTIFICATION
+                        Send release note message to Slack
+  -D DATE, --date DATE  Run this program only on this date
+```
+
+## .env
+
+```
+# 実際にプログラムが動く環境で必要な env(Heroku を想定)
+OWNER = ''
+REPO = ''
+TOKEN_REPO_SCOPE = ''
+SLACK_BOT_TOKEN = ''
+SLACK_MESSAGE_CHANNEL = ''
+PR_BODY = ""
+
+# CI/CD 環境で必要な env(GitHub Actions を想定)
+HEROKU_API_KEY = ''
+HEROKU_APP_NAME = ''
+HEROKU_EMAIL = ''
 ```
 
 ## .env
