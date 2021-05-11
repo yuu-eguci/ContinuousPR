@@ -2,6 +2,7 @@
 
 # Built-in modules.
 import json
+import datetime
 
 # Third-party modules.
 import requests
@@ -76,18 +77,24 @@ def list_commits_on_pull(issue_number: int) -> list:
     return lis
 
 
-def create_comment_body(list_commits_on_pull_result: list) -> str:
-    """コメントの body を作成するビジネスロジックです。
-    内容に注文が入ったら、ばんばん書き換えてよし。
+"""コメントの body を作成するビジネスロジックです。
+内容に注文が入ったら、ばんばん書き換えてよし。
 
-    Args:
-        list_commits_on_pull_result (list): list_commits_on_pull の返却値
+Args:
+    list_commits_on_pull_result (list): list_commits_on_pull の返却値
 
-    Returns:
-        str: コメントの body に使われる想定の文字列
-    """
+Returns:
+    str: コメントの body に使われる想定の文字列
+"""
 
-    body = '## リリースノート'
+
+def create_comment_body(list_commits_on_pull_result: list, base_branch: str) -> str:
+
+    body = (
+        '<!channel>\n'
+        f'*## {datetime.datetime.now().strftime("%Y-%m-%d")} Release Note*\n'
+        '```'
+    )
     for commit in list_commits_on_pull_result:
 
         # メッセージの1行目のみをリリースノートへ記述します。
@@ -101,34 +108,17 @@ def create_comment_body(list_commits_on_pull_result: list) -> str:
             '\n'
             f'- {message} ({author_name} at {author_date})'
         )
-    body += '\n'
-
+    body += (
+        '```\n'
+        f'数日中に、 {base_branch} 環境へのリリース作業を行います。\n'
+        '内容は↑の Release Note を確認してください。\n'
+        '\n'
+        '【お知らせ】編集担当者の方は、 Release Note を確認して頂き、\n'
+        'お知らせが必要な項目について本 channel に文面を投稿してください。\n'
+        '\n'
+        '[本メッセージは自動送信メッセージです]'
+    )
     return body
-
-
-def create_comment(issue_number: int, body: str) -> dict:
-    """api.github.com を使って PR にコメントを投稿します。
-
-    Args:
-        issue_number (int): Issue number
-        body (str): 投稿コメント
-
-    Returns:
-        dict: Returned value from api
-    """
-
-    url = f'https://api.github.com/repos/{consts.OWNER}/{consts.REPO}/issues/{issue_number}/comments'  # noqa: E501
-    payload = {
-        'body': body,
-    }
-    res = requests.post(url, headers=HEADERS_FOR_API, data=json.dumps(payload))
-
-    # 200 系でなければ raise HTTPError します。
-    res.raise_for_status()
-
-    # 返却 json -> dict します。
-    dic = res.json()
-    return dic
 
 
 if __name__ == '__main__':

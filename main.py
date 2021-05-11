@@ -1,7 +1,6 @@
 # Built-in modules.
 import datetime
 import argparse
-import time
 import sys
 
 # Third-party modules.
@@ -58,25 +57,11 @@ if not args.slack_notification:
 list_commits_on_pull_result = functions.list_commits_on_pull(
     create_pull_result['number'])
 logger.info(f'Successfully listed commits, count: {len(list_commits_on_pull_result)}')  # noqa: E501
-comment_body = functions.create_comment_body(list_commits_on_pull_result)
+comment_body = functions.create_comment_body(
+    list_commits_on_pull_result,
+    args.base,
+)
 
-print(comment_body)
-
-# その他、個別に Slack へ投稿を行います。
-# NOTE: メンション付で投稿を行うための処置です。
-#       ここに commits 一覧も含めてしまえばラベルやコメントが不要になります。
-#       ただし Slack 側に PR へのリンクも欲しいのでコメント通知を取り入れています。
-message = f'''
-<!channel> 数日中に、 {args.base} 環境へのリリース作業を行います。
-内容は↑に投稿されたリリースノートを確認してください。
-
-【お知らせ】編集担当者の方は、リリースノートを確認して頂き、
-お知らせが必要な項目について本 channel に文面を投稿してください。
-
-[本メッセージは自動送信メッセージです]
-'''
-# NOTE: 待機しているのは、通知の順番をプログラムの実行順と合わせるためです。
-#       待機せずに send_slack_message すると、こちらのメッセージが上のコメント通知よりも先に送付されてしまうので。
-time.sleep(10)
-utils.send_slack_message(message)
+# comment_body として取得した内容は、リリースノートとして扱い Slack へ送ります。
+utils.send_slack_message(comment_body)
 logger.info('Successfully sent message to Slack')

@@ -74,15 +74,16 @@ def send_slack_message(message: str) -> None:
 
     try:
         # NOTE: unfurl_links は時折鬱陶しいと思っている「リンクの展開機能」です。不要です。 False.
-        response = slack_client.chat_postMessage(
+        slack_client.chat_postMessage(
             channel=consts.SLACK_MESSAGE_CHANNEL,
             text=message,
             unfurl_links=False)
-        # NOTE: Slack api のドキュメントにあるコードですが、正常に終了しても false になる場合があるので注意。
-        #       リンクの含まれるメッセージを送信すると、返却値が勝手に変更されるため一致しません。
+        # 返却値の確認は行いません。
+        # NOTE: Slack api のドキュメントにあるコードなので追加していましたが排除します。
+        #       リンクの含まれるメッセージを送信すると、返却値が勝手に変更されるため絶対一致しないからです。
         #       - リンクの前後に <, > がつく
         #       - & -> &amp; エスケープが起こる
-        assert response['message']['text'] == message
+        # assert response['message']['text'] == message
     except SlackApiError as e:
         assert e.response['ok'] is False
         # str like 'invalid_auth', 'channel_not_found'
