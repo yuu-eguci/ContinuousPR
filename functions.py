@@ -77,18 +77,17 @@ def list_commits_on_pull(issue_number: int) -> list:
     return lis
 
 
-"""コメントの body を作成するビジネスロジックです。
-内容に注文が入ったら、ばんばん書き換えてよし。
-
-Args:
-    list_commits_on_pull_result (list): list_commits_on_pull の返却値
-
-Returns:
-    str: コメントの body に使われる想定の文字列
-"""
-
-
 def create_comment_body(list_commits_on_pull_result: list, base_branch: str) -> str:
+    """コメントの body を作成するビジネスロジックです。
+    内容に注文が入ったら、ばんばん書き換えてよし。
+
+    Args:
+        list_commits_on_pull_result (list): list_commits_on_pull の返却値
+        base_branch (str): base branch 名
+
+    Returns:
+        str: コメントの body に使われる想定の文字列
+    """
 
     body = (
         '<!channel>\n'
