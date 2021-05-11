@@ -15,8 +15,10 @@ utils.send_slack_message(message)
 
 # Built-in modules.
 import logging
+import datetime
 
 # Third-party modules.
+import pytz
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
@@ -89,6 +91,16 @@ def send_slack_message(message: str) -> None:
         # str like 'invalid_auth', 'channel_not_found'
         assert e.response['error']
         logger.error(f'Got an error: {e.response["error"]}')
+
+
+def get_today_jst(_format: str) -> str:
+    """日本時間の現在時刻を取得します。
+    NOTE: format はビルトインメソッドがあるので一応 underscore をつけています。
+    """
+
+    TZ_JAPAN = pytz.timezone('Asia/Tokyo')
+    current_jst_time = datetime.datetime.now(tz=TZ_JAPAN)
+    return current_jst_time.strftime(_format)
 
 
 # utils モジュール用のロガーを作成します。
