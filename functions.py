@@ -92,7 +92,7 @@ def create_comment_body(list_commits_on_pull_result: list, base_branch: str) -> 
     body = (
         '<!channel>\n'
         f'*## {datetime.datetime.now().strftime("%Y-%m-%d")} Release Note*\n'
-        '```'
+        '\n'
     )
     for commit in list_commits_on_pull_result:
 
@@ -108,7 +108,8 @@ def create_comment_body(list_commits_on_pull_result: list, base_branch: str) -> 
             f'- {message} ({author_name} at {author_date})'
         )
     body += (
-        '```\n'
+        '\n'
+        '***\n'
         f'数日中に、 {base_branch} 環境へのリリース作業を行います。\n'
         '内容は↑の Release Note を確認してください。\n'
         '\n'
